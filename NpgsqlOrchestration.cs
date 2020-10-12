@@ -39,6 +39,13 @@ namespace NpgsqlHeavyCpu
                 {
                 }
             }
+
+            // You can either run the CPU function and the Npgsql function in the same function or separate functions
+
+            // var stopwatch = Stopwatch.StartNew();
+            // await using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("PostgresConnectionString"));
+            // await connection.OpenAsync();
+            // return $"{executionContext.InvocationId}: {stopwatch.ElapsedMilliseconds}";
         }
 
         [FunctionName("NpgsqlOrchestration_RunAsync")]
