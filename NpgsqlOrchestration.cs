@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -59,7 +57,7 @@ namespace NpgsqlHeavyCpu
             ILogger log)
         {
             // Function input comes from the request content.
-            string instanceId = await starter.StartNewAsync("NpgsqlOrchestration", null);
+            string instanceId = await starter.StartNewAsync("NpgsqlOrchestration");
 
             log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 
