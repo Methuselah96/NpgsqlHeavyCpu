@@ -27,7 +27,7 @@ namespace NpgsqlHeavyCpu
         public static async Task<string> RunOrchestratorSub(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
-            await context.CallActivityAsync<string>("NpgsqlOrchestration_RunCpu", null);
+            await context.CallActivityAsync("NpgsqlOrchestration_RunCpu", null);
             return await context.CallActivityAsync<string>("NpgsqlOrchestration_RunAsync", null);
         }
 
