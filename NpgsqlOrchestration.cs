@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -21,12 +19,20 @@ namespace NpgsqlHeavyCpu
         public static Task<string[]> RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
-            var tasks = Enumerable.Range(0, 25).Select(_ => context.CallActivityAsync<string>("NpgsqlOrchestration_Run", null));
+            var tasks = Enumerable.Range(0, 100).Select(_ => context.CallSubOrchestratorAsync<string>("PostgresOrchestration_Sub", null));
             return Task.WhenAll(tasks);
         }
 
-        [FunctionName("NpgsqlOrchestration_Run")]
-        public static async Task<string> Run([ActivityTrigger] IDurableOrchestrationContext context, ExecutionContext executionContext, ILogger log)
+        [FunctionName("PostgresOrchestration_Sub")]
+        public static async Task<string> RunOrchestratorSub(
+            [OrchestrationTrigger] IDurableOrchestrationContext context)
+        {
+            await context.CallActivityAsync<string>("NpgsqlOrchestration_RunCpu", null);
+            return await context.CallActivityAsync<string>("NpgsqlOrchestration_RunAsync", null);
+        }
+
+        [FunctionName("NpgsqlOrchestration_RunCpu")]
+        public static void RunCpu([ActivityTrigger] IDurableOrchestrationContext context)
         {
             for (var i = 0; i < 50; i++)
             {
@@ -35,7 +41,11 @@ namespace NpgsqlHeavyCpu
                 {
                 }
             }
+        }
 
+        [FunctionName("NpgsqlOrchestration_RunAsync")]
+        public static async Task<string> RunAsync([ActivityTrigger] IDurableOrchestrationContext context, ExecutionContext executionContext)
+        {
             var stopwatch = Stopwatch.StartNew();
             using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("PostgresConnectionString"));
             await connection.OpenAsync();
