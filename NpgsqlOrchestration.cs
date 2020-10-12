@@ -45,7 +45,7 @@ namespace NpgsqlHeavyCpu
         public static async Task<string> RunAsync([ActivityTrigger] IDurableOrchestrationContext context, ExecutionContext executionContext)
         {
             var stopwatch = Stopwatch.StartNew();
-            using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("PostgresConnectionString"));
+            await using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("PostgresConnectionString"));
             await connection.OpenAsync();
             return $"{executionContext.InvocationId}: {stopwatch.ElapsedMilliseconds}";
         }
