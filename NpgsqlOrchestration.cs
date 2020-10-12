@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -27,26 +28,13 @@ namespace NpgsqlHeavyCpu
         [FunctionName("NpgsqlOrchestration_Run")]
         public static async Task<string> Run([ActivityTrigger] IDurableOrchestrationContext context, ExecutionContext executionContext, ILogger log)
         {
-            //var heavyCpuResults = Enumerable.Range(0, 50).AsParallel().Select(index =>
-            //{
-            //    var watch = Stopwatch.StartNew();
-            //    while (watch.ElapsedMilliseconds < 100)
-            //    {
-            //    }
-
-            //    return index;
-            //}).ToList();
-            var bag = new ConcurrentBag<int>();
-
-            var heavyCpuResults = Parallel.ForEach(Enumerable.Range(0, 50), index =>
+            for (var i = 0; i < 50; i++)
             {
                 var watch = Stopwatch.StartNew();
                 while (watch.ElapsedMilliseconds < 100)
                 {
                 }
-
-                bag.Add(index);
-            });
+            }
 
             var stopwatch = Stopwatch.StartNew();
             using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("PostgresConnectionString"));
