@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -52,7 +53,7 @@ namespace NpgsqlHeavyCpu
         public static async Task<string> RunAsync([ActivityTrigger] IDurableOrchestrationContext context, ExecutionContext executionContext)
         {
             var stopwatch = Stopwatch.StartNew();
-            await using var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("PostgresConnectionString"));
+            await using var connection = new SqlConnection(Environment.GetEnvironmentVariable("SqlServerConnectionString"));
             await connection.OpenAsync();
             return $"{executionContext.InvocationId}: {stopwatch.ElapsedMilliseconds}";
         }
