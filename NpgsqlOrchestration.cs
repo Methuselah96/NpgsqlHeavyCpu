@@ -35,7 +35,7 @@ namespace NpgsqlHeavyCpu
             for (var i = 0; i < 50; i++)
             {
                 var watch = Stopwatch.StartNew();
-                while (watch.ElapsedMilliseconds < 100)
+                while (watch.ElapsedMilliseconds < 1000)
                 {
                 }
             }
